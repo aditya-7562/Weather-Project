@@ -73,7 +73,8 @@ pipeline {
         }
     }
     post {
-        always {
+    always {
+        node {
             script {
                 // Clean up the container after deployment
                 sh '''
@@ -82,11 +83,12 @@ pipeline {
                 '''
             }
         }
-        success {
-            echo 'Build completed successfully! 🚀'
-        }
-        failure {
-            echo 'Build failed! Please check the logs for errors. ⚠️'
-        }
     }
+    success {
+        echo 'Build completed successfully! 🚀'
+    }
+    failure {
+        echo 'Build failed! Please check the logs for errors. ⚠️'
+    }
+}
 }
