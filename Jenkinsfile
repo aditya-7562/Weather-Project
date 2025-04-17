@@ -6,7 +6,7 @@ pipeline {
         DOCKER_USERNAME = 'aditya7652' 
         DOCKER_REGISTRY = 'docker.io'
         GITHUB_REPO = 'https://github.com/aditya-7562/Weather-Project.git'
-        GITHUB_TOKEN = credentials('8e28fd18-016f-44bc-99b2-f2bf65e51f3c') // GitHub Token
+        GITHUB_TOKEN = credentials('GITHUB_TOKEN') // GitHub Token
         DOCKER_PASSWORD = credentials('docker-hub-password') // Docker Hub credentials
     }
     stages {
