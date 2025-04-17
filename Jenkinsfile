@@ -6,8 +6,8 @@ pipeline {
         DOCKER_USERNAME = 'aditya7652' 
         DOCKER_REGISTRY = 'docker.io'
         GITHUB_REPO = 'https://github.com/aditya-7562/Weather-Project.git'
-        GITHUB_TOKEN = credentials('8e28fd18-016f-44bc-99b2-f2bf65e51f3c')
-        DOCKER_PASSWORD = credentials('docker-hub-password')
+        GITHUB_TOKEN = credentials('8e28fd18-016f-44bc-99b2-f2bf65e51f3c') // GitHub Token
+        DOCKER_PASSWORD = credentials('docker-hub-password') // Docker Hub credentials
     }
     stages {
         stage('Checkout Code') {
@@ -18,6 +18,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Build the Docker image
                     sh 'docker build -t $DOCKER_USERNAME/$DOCKER_IMAGE:$DOCKER_TAG .'
                 }
             }
@@ -25,6 +26,7 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
+                    // Run the container (detached)
                     sh 'docker run -d -p 8080:80 --name weather-app-container $DOCKER_USERNAME/$DOCKER_IMAGE:$DOCKER_TAG'
                 }
             }
@@ -32,14 +34,18 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-                    sh 'docker push $DOCKER_USERNAME/$DOCKER_IMAGE:$DOCKER_TAG'
+                    // Login to DockerHub using credentials
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-password', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                        sh 'docker push $DOCKER_USERNAME/$DOCKER_IMAGE:$DOCKER_TAG'
+                    }
                 }
             }
         }
         stage('Deploy to GitHub Pages') {
             steps {
                 script {
+                    // Git config for user
                     sh '''
                         git config --global user.email "aditya.12114424@lpu.in"
                         git config --global user.name "aditya-7562"
@@ -64,17 +70,23 @@ pipeline {
                     '''
                 }
             }
-}
-
+        }
     }
     post {
         always {
             script {
+                // Clean up the container after deployment
                 sh '''
                     docker ps -q --filter "name=weather-app-container" | xargs -r docker stop
                     docker ps -a -q --filter "name=weather-app-container" | xargs -r docker rm
                 '''
             }
+        }
+        success {
+            echo 'Build completed successfully! 🚀'
+        }
+        failure {
+            echo 'Build failed! Please check the logs for errors. ⚠️'
         }
     }
 }
