@@ -7,7 +7,7 @@ pipeline {
         DOCKER_REGISTRY = 'docker.io'
         GITHUB_REPO = 'https://github.com/aditya-7562/Weather-Project.git'
         GITHUB_TOKEN = credentials('GITHUB_TOKEN') // GitHub Token
-        DOCKER_PASSWORD = credentials('docker-hub-password') // Docker Hub credentials
+        // DOCKER_PASSWORD = credentials('docker-hub-password') // Docker Hub credentials
     }
     stages {
         stage('Checkout Code') {
@@ -74,7 +74,7 @@ pipeline {
     }
     post {
     always {
-        
+        node {
             script {
                 // Clean up the container after deployment
                 sh '''
@@ -82,7 +82,7 @@ pipeline {
                     docker ps -a -q --filter "name=weather-app-container" | xargs -r docker rm
                 '''
             }
-        
+        }
     }
     success {
         echo 'Build completed successfully! 🚀'
@@ -91,4 +91,5 @@ pipeline {
         echo 'Build failed! Please check the logs for errors. ⚠️'
     }
 }
+
 }
