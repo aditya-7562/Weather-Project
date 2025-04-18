@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: "$GITHUB_REPO"
+                git branch: 'main', url: "${GITHUB_REPO}"
             }
         }
         stage('Build Docker Image') {
@@ -41,32 +41,36 @@ pipeline {
         stage('Deploy to GitHub Pages') {
             steps {
                 script {
-                    sh '''
-                        git config --global user.email "aditya.12114424@lpu.in"
-                        git config --global user.name "aditya-7562"
+                    withCredentials([string(credentialsId: 'GITHUB_TOKEN', variable: 'GH_TOKEN')]) {
+                        sh '''
+                            git config --global user.email "aditya.12114424@lpu.in"
+                            git config --global user.name "aditya-7562"
 
-                        git clone --depth=1 --branch=gh-pages https://x-access-token:${GITHUB_TOKEN}@github.com/aditya-7562/Weather-Project.git gh-pages
-                        cd gh-pages
+                            git clone --depth=1 --branch=gh-pages https://x-access-token:${GH_TOKEN}@github.com/aditya-7562/Weather-Project.git gh-pages
+                            cd gh-pages
 
-                        rm -rf *
-                        cp -r ../* .
-                        rm -rf .gitignore Dockerfile Jenkinsfile README.md
+                            rm -rf *
+                            cp -r ../* .
+                            rm -rf .gitignore Dockerfile Jenkinsfile README.md
 
-                        git add .
-                        git commit -m "Deploy updated weather app to GitHub Pages"
-                        git push origin gh-pages
-                    '''
+                            git add .
+                            git commit -m "Deploy updated weather app to GitHub Pages"
+                            git push origin gh-pages
+                        '''
+                    }
                 }
             }
         }
     }
     post {
         always {
-            script {
-                sh '''
-                    docker ps -q --filter "name=weather-app-container" | xargs -r docker stop
-                    docker ps -a -q --filter "name=weather-app-container" | xargs -r docker rm
-                '''
+            node {
+                script {
+                    sh '''
+                        docker ps -q --filter "name=weather-app-container" | xargs -r docker stop
+                        docker ps -a -q --filter "name=weather-app-container" | xargs -r docker rm
+                    '''
+                }
             }
         }
         success {
