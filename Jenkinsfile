@@ -83,13 +83,11 @@ pipeline {
 
     post {
         always {
-            node {
-                script {
-                    sh '''
-                        docker ps -q --filter "name=weather-app-container" | xargs -r docker stop || true
-                        docker ps -a -q --filter "name=weather-app-container" | xargs -r docker rm || true
-                    '''
-                }
+            script {
+                sh '''
+                    docker ps -q --filter "name=weather-app-container" | xargs -r docker stop || true
+                    docker ps -a -q --filter "name=weather-app-container" | xargs -r docker rm || true
+                '''
             }
         }
         success {
@@ -99,4 +97,5 @@ pipeline {
             echo 'Build failed! Please check the logs for errors. ⚠️'
         }
     }
+
 }
