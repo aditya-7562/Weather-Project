@@ -74,7 +74,7 @@ pipeline {
     }
     post {
     always {
-        node {
+        
             script {
                 // Clean up the container after deployment
                 sh '''
@@ -82,7 +82,7 @@ pipeline {
                     docker ps -a -q --filter "name=weather-app-container" | xargs -r docker rm
                 '''
             }
-        }
+        
     }
     success {
         echo 'Build completed successfully! 🚀'
