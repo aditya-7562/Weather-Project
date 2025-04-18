@@ -14,7 +14,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                node {
+                node('any') {  // Specify agent here
                     git branch: 'main', url: "$GITHUB_REPO"
                 }
             }
@@ -22,7 +22,7 @@ pipeline {
 
         stage('Debug Env') {
             steps {
-                node {
+                node('any') {  // Specify agent here
                     script {
                         echo "GitHub token is ${env.GITHUB_TOKEN ? 'available ✅' : 'missing ❌'}"
                     }
@@ -32,7 +32,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                node {
+                node('any') {  // Specify agent here
                     script {
                         sh 'docker build -t $DOCKER_USERNAME/$DOCKER_IMAGE:$DOCKER_TAG .'
                     }
@@ -42,7 +42,7 @@ pipeline {
 
         stage('Run Docker Container') {
             steps {
-                node {
+                node('any') {  // Specify agent here
                     script {
                         sh 'docker run -d -p 8080:80 --name weather-app-container $DOCKER_USERNAME/$DOCKER_IMAGE:$DOCKER_TAG'
                     }
@@ -52,7 +52,7 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                node {
+                node('any') {  // Specify agent here
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-password', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         script {
                             sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
@@ -65,7 +65,7 @@ pipeline {
 
         stage('Deploy to GitHub Pages') {
             steps {
-                node {
+                node('any') {  // Specify agent here
                     script {
                         sh '''
                             git config --global user.email "aditya.12114424@lpu.in"
@@ -95,7 +95,7 @@ pipeline {
 
     post {
         always {
-            node {
+            node('any') {  // Specify agent here
                 script {
                     sh '''
                         docker ps -q --filter "name=weather-app-container" | xargs -r docker stop || echo "No container to stop"
