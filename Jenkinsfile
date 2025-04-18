@@ -64,8 +64,8 @@ pipeline {
     }
     post {
         always {
-            node {
-                script {
+            script {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     sh '''
                         docker ps -q --filter "name=weather-app-container" | xargs -r docker stop
                         docker ps -a -q --filter "name=weather-app-container" | xargs -r docker rm
