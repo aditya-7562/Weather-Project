@@ -7,10 +7,21 @@ pipeline {
         DOCKER_USERNAME = 'aditya7652'
         DOCKER_REGISTRY = 'docker.io'
         GITHUB_REPO = 'https://github.com/aditya-7562/Weather-Project.git'
-        GITHUB_TOKEN = credentials('GITHUB_TOKEN') // Ensure GitHub token is set as a Jenkins secret
+        GITHUB_TOKEN = credentials('GITHUB_TOKEN') // Jenkins secret
+    }
+
+    options {
+        disableConcurrentBuilds()
+        skipDefaultCheckout()
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 checkout scm
@@ -102,3 +113,4 @@ pipeline {
         }
     }
 }
+
