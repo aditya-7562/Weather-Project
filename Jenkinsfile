@@ -105,7 +105,7 @@ pipeline {
             sh 'docker image prune -f'
         }
         success {
-            echo 'Pipeline completed successfully! 🚀'
+            echo 'Pipeline executed successfully! 🚀'
             echo 'Docker image pushed to Docker Hub and website deployed to GitHub Pages.'
         }
         failure {
